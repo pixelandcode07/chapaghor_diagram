@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>বর্ণিল প্রিন্টিং প্রেস — Database ERD</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Inter:wght@400;500;600;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0F172A;font-family:'Inter',sans-serif;overflow:hidden;height:100vh;user-select:none}
+#toolbar{background:#0F172A;color:white;padding:0 14px;display:flex;align-items:center;gap:10px;height:48px;border-bottom:1px solid #1E293B;flex-shrink:0;position:relative;z-index:50}
+.tb-logo{font-size:11px;font-weight:700;color:#60A5FA;letter-spacing:.5px}.tb-sub{font-size:9px;color:#475569}
+.tb-sep{color:#1E293B;font-size:18px}
+.zoom-controls{display:flex;gap:3px;align-items:center}
+.zoom-btn{background:#1E293B;border:1px solid #334155;color:#94A3B8;width:28px;height:28px;border-radius:5px;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.zoom-btn:hover{background:#2563EB;color:white;border-color:#2563EB}
+#zoom-lbl{color:#64748B;font-size:10px;min-width:38px;text-align:center;font-variant-numeric:tabular-nums}
+.legend{display:flex;gap:10px;flex-wrap:wrap}
+.li{display:flex;align-items:center;gap:4px;font-size:9.5px;color:#94A3B8;white-space:nowrap}
+.ld{width:10px;height:10px;border-radius:2px;flex-shrink:0}
+.stats{font-size:9px;color:#334155;margin-left:auto;text-align:right;line-height:1.6}
+#vp{width:100vw;height:calc(100vh - 48px);overflow:hidden;cursor:grab;position:relative;background:
+  radial-gradient(circle at 20% 20%, rgba(37,99,235,0.04) 0%, transparent 50%),
+  radial-gradient(circle at 80% 80%, rgba(109,40,217,0.04) 0%, transparent 50%),
+  #0F172A}
+#vp::before{content:'';position:absolute;inset:0;background-image:radial-gradient(circle,#1E293B 1px,transparent 1px);background-size:28px 28px;pointer-events:none;opacity:.5}
+#vp.drag{cursor:grabbing}
+#cv{position:absolute;transform-origin:0 0;width:5200px;height:3600px}
+#svgl{position:absolute;top:0;left:0;width:5200px;height:3600px;pointer-events:none;overflow:visible}
+.sb{position:absolute;border-radius:14px;border:1.5px dashed;pointer-events:none}
+.sl{position:absolute;font-size:9.5px;font-weight:700;letter-spacing:2px;text-transform:uppercase;opacity:.5;pointer-events:none}
+.cb{position:absolute;width:248px;background:#0F172A;border-radius:8px;box-shadow:0 0 0 1.5px #1E293B,0 8px 32px rgba(0,0,0,.5);overflow:hidden;transition:box-shadow .2s}
+.cb:hover{box-shadow:0 0 0 1.5px #2563EB,0 12px 40px rgba(37,99,235,.25);z-index:100}
+.ch{padding:8px 10px;display:flex;align-items:center;gap:7px;font-weight:700;font-size:11.5px;color:white}
+.ci{font-size:13px;line-height:1}
+.cd{background:#080F1A;padding:3px 10px;font-size:8.5px;color:#475569;border-bottom:1px solid #1E293B;font-style:italic;line-height:1.5}
+.fr{display:flex;align-items:center;padding:2px 8px;gap:5px;border-bottom:.5px solid #0F172A;min-height:20px}
+.fr:nth-child(even){background:#080F1A}
+.fb{width:14px;height:14px;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:7.5px;flex-shrink:0}
+.fpk{background:#422006;color:#F59E0B}
+.ffk{background:#052E16;color:#22C55E}
+.fidx{background:#0F172A;color:#60A5FA;border:1px solid #1E3A5F}
+.fe{opacity:0}
+.fn{color:#E2E8F0;font-size:9.5px;font-family:'JetBrains Mono',monospace;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fn.pk{color:#F59E0B}
+.fn.fk{color:#22C55E}
+.fn.idx{color:#60A5FA}
+.ft{color:#334155;font-size:8.5px;font-family:'JetBrains Mono',monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100px}
+</style>
+</head>
+<body>
+<div id="toolbar">
+  <div><div class="tb-logo">বর্ণিল প্রিন্টিং প্রেস — Database ERD</div><div class="tb-sub">MERN Stack · MongoDB · Pixel & Code Agency</div></div>
+  <span class="tb-sep">|</span>
+  <div class="zoom-controls">
+    <button class="zoom-btn" onclick="sz(sc*1.25)" title="Zoom In">+</button>
+    <span id="zoom-lbl">55%</span>
+    <button class="zoom-btn" onclick="sz(sc*.8)" title="Zoom Out">−</button>
+    <button class="zoom-btn" onclick="rv()" title="Reset">⌂</button>
+    <button class="zoom-btn" onclick="fv()" title="Fit All">⊡</button>
+  </div>
+  <span class="tb-sep">|</span>
+  <div class="legend">
+    <div class="li"><div class="ld" style="background:#2563EB"></div>Core</div>
+    <div class="li"><div class="ld" style="background:#7C3AED"></div>Module A — Print</div>
+    <div class="li"><div class="ld" style="background:#059669"></div>Module B — Banner</div>
+    <div class="li"><div class="ld" style="background:#DC2626"></div>Module C — E-com</div>
+    <div class="li"><div class="ld" style="background:#475569"></div>Admin Config</div>
+    <div class="li"><div class="ld" style="background:#422006;border:1px solid #F59E0B"></div>PK</div>
+    <div class="li"><div class="ld" style="background:#052E16;border:1px solid #22C55E"></div>FK</div>
+    <div class="li"><div class="ld" style="background:#0F172A;border:1px solid #60A5FA"></div>IDX</div>
+  </div>
+  <div class="stats">27 Collections · 150+ Fields<br>25+ Relationships · MERN Stack</div>
+</div>
+<div id="vp">
+  <div id="cv">
+    <svg id="svgl"></svg>
+    <div id="bc"></div>
+  </div>
+</div>
+<script>
+const C=[
+  // ══ CORE ══
+  {id:'users',name:'users',m:'core',icon:'👤',x:60,y:70,desc:'Root auth। JWT generate হয়।',
+   f:[{n:'_id',t:'ObjectId',b:'pk'},{n:'name',t:'String',b:'idx'},{n:'email',t:'String (unique)',b:'idx'},{n:'phone',t:'String (unique)',b:'idx'},{n:'passwordHash',t:'String',b:''},{n:'role',t:'enum[user,admin]',b:''},{n:'isActive',t:'Boolean',b:''},{n:'profileImage',t:'String?',b:''},{n:'createdAt',t:'Date',b:''},{n:'updatedAt',t:'Date',b:''}]},
+  {id:'addresses',name:'addresses',m:'core',icon:'📍',x:340,y:70,desc:'ডেলিভারি address store হয়।',
+   f:[{n:'_id',t:'ObjectId',b:'pk'},{n:'userId',t:'ObjectId → users',b:'fk'},{n:'label',t:'enum[home,office,other]',b:''},{n:'recipientName',t:'String',b:''},{n:'phone',t:'String',b:''},{n:'street',t:'String',b:''},{n:'city',t:'String',b:''},{n:'district',t:'String',b:''},{n:'isDefault',t:'Boolean',b:''},{n:'createdAt',t:'Date',b:''}]},
+  {id:'refresh_tokens',name:'refresh_tokens',m:'core',icon:'🔑',x:620,y:70,desc:'JWT refresh token blacklisting ও rotation।',
+   f:[{n:'_id',t:'ObjectId',b:'pk'},{n:'userId',t:'ObjectId → users',b:'fk'},{n:'token',t:'String (unique)',b:'idx'},{n:'expiresAt',t:'Date',b:''},{n:'ipAddress',t:'String?',b:''},{n:'userAgent',t:'String?',b:''},{n:'createdAt',t:'Date',b:''}]},
+  {id:'notifications',name:'notifications',m:'core',icon:'🔔',x:900,y:70,desc:'In-app + email + SMS notification log।',
+   f:[{n:'_id',t:'ObjectId',b:'pk'},{n:'userId',t:'ObjectId → users',b:'fk'},{n:'type',t:'enum[quotation,order,payment]',b:''},{n:'title',t:'String',b:''},{n:'message',t:'String',b:''},{n:'isRead',t:'Boolean',b:''},{n:'orderId',t:'ObjectId? → orders',b:'fk'},{n:'createdAt',t:'Date',b:'idx'}]},
+  // Orders
+  {id:'cart_items',name:'cart_items',m:'core',icon:'🛒',x:60,y:600,desc:'Unified cart। A+B+C সব module এক cart।',
+   f:[{n:'_id',t:'ObjectId',b:'pk'},{n:'userId',t:'ObjectId → users',b:'fk'},{n:'moduleType',t:'enum[A,B,C]',b:''},{n:'productId',t:'ObjectId? → products',b:'fk'},{n:'variantId',t:'ObjectId? → variants',b:'fk'},{n:'mediaTypeId',t:'ObjectId? → media_types',b:'fk'},{n:'printCategoryId',t:'ObjectId? → categories',b:'fk'},{n:'config',t:'Mixed (JSON)',b:''},{n:'quantity',t:'Number',b:''},{n:'unitPrice',t:'Number',b:''},{n:'totalPrice',t:'Number',b:''},{n:'designFileUrl',t:'String?',b:''},{n:'createdAt',t:'Date',b:''}]},
+  {id:'orders',name:'orders',m:'core',icon:'📦',x:340,y:600,desc:'Central order। সব module এখানে store।',
+   f:[{n:'_id',t:'ObjectId',b:'pk'},{n:'userId',t:'ObjectId → users',b:'fk'},{n:'orderNumber',t:'String (unique)',b:'idx'},{n:'status',t:'enum[pending→completed]',b:'idx'},{n:'orderType',t:'enum[print,banner,merch,mixed]',b:''},{n:'addressId',t:'ObjectId → addresses',b:'fk'},{n:'subtotal',t:'Number',b:''},{n:'total',t:'Number',b:''},{n:'paidAmount',t:'Number',b:''},{n:'remainingAmount',t:'Number',b:''},{n:'paymentStatus',t:'enum[unpaid,partial,paid]',b:'idx'},{n:'splitPayment',t:'Boolean',b:''},{n:'invoiceId',t:'ObjectId? → invoices',b:'fk'},{n:'createdAt',t:'Date',b:'idx'}]},
+  {id:'order_items',name:'order_items',m:'core',icon:'📋',x:620,y:600,desc:'Order-এর line items। Config snapshot।',
+   f:[{n:'_id',t:'ObjectId',b:'pk'},{n:'orderId',t:'ObjectId → orders',b:'fk'},{n:'moduleType',t:'enum[A,B,C]',b:''},{n:'quoteRequestId',t:'ObjectId? → quote_req',b:'fk'},{n:'bannerItemId',t:'ObjectId? → banner_items',b:'fk'},{n:'productId',t:'ObjectId? → products',b:'fk'},{n:'variantId',t:'ObjectId? → variants',b:'fk'},{n:'quantity',t:'Number',b:''},{n:'unitPrice',t:'Number',b:''},{n:'totalPrice',t:'Number',b:''},{n:'config',t:'Mixed (JSON snapshot)',b:''}]},
+  {id:'payments',name:'payments',m:'core',icon:'💳',x:900,y:600,desc:'প্রতিটি payment attempt। Webhook store।',
+   f:[{n:'_id',t:'ObjectId',b:'pk'},{n:'orderId',t:'ObjectId → orders',b:'fk'},{n:'userId',t:'ObjectId → users',b:'fk'},{n:'amount',t:'Number',b:''},{n:'gateway',t:'enum[bkash,nagad,stripe,card]',b:''},{n:'transactionId',t:'String (unique)',b:'idx'},{n:'paymentType',t:'enum[advance_50,full,remaining]',b:''},{n:'status',t:'enum[pending,success,failed,refunded]',b:'idx'},{n:'gatewayResponse',t:'Mixed (JSON)',b:''},{n:'paidAt',t:'Date?',b:''},{n:'createdAt',t:'Date',b:''}]},
+  {id:'invoices',name:'invoices',m:'core',icon:'🧾',x:1180,y:600,desc:'Auto-generated। PDF Cloudinary-তে upload।',
+   f:[{n:'_id',t:'ObjectId',b:'pk'},{n:'orderId',t:'ObjectId → orders',b:'fk'},{n:'userId',t:'ObjectId → users',b:'fk'},{n:'invoiceNumber',t:'String (unique)',b:'idx'},{n:'items',t:'Array<{label,qty,amount}>',b:''},{n:'subtotal',t:'Number',b:''},{n:'total',t:'Number',b:''},{n:'paidAmount',t:'Number',b:''},{n:'dueAmount',t:'Number',b:''},{n:'pdfUrl',t:'String?',b:''},{n:'issuedAt',t:'Date',b:''}]},
+  // ══ MODULE A ══
+  {id:'print_categories',name:'print_categories',m:'a',icon:'🖨️',x:60,y:1220,desc:'e.g. Visiting Card, Poster, Flyer। Admin manage।',
+   f:[{n:'_id',t:'ObjectId',b:'pk'},{n:'name',t:'String',b:'idx'},{n:'slug',t:'String (unique)',b:'idx'},{n:'description',t:'String?',b:''},{n:'iconUrl',t:'String?',b:''},{n:'isActive',t:'Boolean',b:''},{n:'sortOrder',t:'Number',b:''},{n:'createdAt',t:'Date',b:''}]},
+  {id:'print_attribute_groups',name:'print_attr_groups',m:'a',icon:'📑',x:340,y:1220,desc:'প্রতি category-তে কোন field দেখাবে।',
+   f:[{n:'_id',t:'ObjectId',b:'pk'},{n:'categoryId',t:'ObjectId → print_categories',b:'fk'},{n:'attributeType',t:'enum[paperType,gsm,size,color..]',b:''},{n:'label',t:'String',b:''},{n:'isRequired',t:'Boolean',b:''},{n:'isActive',t:'Boolean',b:''},{n:'sortOrder',t:'Number',b:''}]},
+  {id:'print_attribute_options',name:'print_attr_options',m:'a',icon:'⚙️',x:620,y:1220,desc:'paperType: Art Paper, Matt, Gloss, Kraft।',
+   f:[{n:'_id',t:'ObjectId',b:'pk'},{n:'groupId',t:'ObjectId → attr_groups',b:'fk'},{n:'value',t:'String',b:''},{n:'label',t:'String',b:''},{n:'additionalCost',t:'Number',b:''},{n:'isActive',t:'Boolean',b:''},{n:'sortOrder',t:'Number',b:''},{n:'createdAt',t:'Date',b:''}]},
+  {id:'print_quote_requests',name:'print_quote_requests',m:'a',icon:'📝',x:900,y:1220,desc:'Module A core। User submit, admin price দেয়।',
+   f:[{n:'_id',t:'ObjectId',b:'pk'},{n:'userId',t:'ObjectId → users',b:'fk'},{n:'categoryId',t:'ObjectId → print_categories',b:'fk'},{n:'selectedOptions',t:'Map',b:''},{n:'quantity',t:'Number',b:''},{n:'designFileUrl',t:'String?',b:''},{n:'status',t:'enum[pending,quoted,accepted..]',b:'idx'},{n:'quotedPrice',t:'Number?',b:''},{n:'adminNote',t:'String?',b:''},{n:'orderId',t:'ObjectId? → orders',b:'fk'},{n:'createdAt',t:'Date',b:'idx'}]},
+  {id:'quotations',name:'quotations',m:'a',icon:'💬',x:1180,y:1220,desc:'Admin quotation। Accept → order তৈরি হয়।',
+   f:[{n:'_id',t:'ObjectId',b:'pk'},{n:'quoteRequestId',t:'ObjectId → quote_requests',b:'fk'},{n:'orderId',t:'ObjectId? → orders',b:'fk'},{n:'userId',t:'ObjectId → users',b:'fk'},{n:'quotedByAdmin',t:'ObjectId → users (admin)',b:'fk'},{n:'quotedPrice',t:'Number',b:''},{n:'breakdown',t:'Array<{label,amount}>',b:''},{n:'validUntil',t:'Date',b:''},{n:'status',t:'enum[pending,sent,accepted..]',b:'idx'},{n:'acceptedAt',t:'Date?',b:''},{n:'createdAt',t:'Date',b:''}]},
+  // ══ MODULE B ══
+  {id:'media_types',name:'media_types',m:'b',icon:'🖼️',x:1750,y:70,desc:'Vinyl (৳5/sq.in), Flex (৳3/sq.in), Sticker।',
+   f:[{n:'_id',t:'ObjectId',b:'pk'},{n:'name',t:'String',b:'idx'},{n:'slug',t:'String (unique)',b:'idx'},{n:'pricePerSqInch',t:'Number',b:''},{n:'pricePerSqFt',t:'Number',b:''},{n:'unit',t:'enum[inch,ft]',b:''},{n:'minWidth',t:'Number',b:''},{n:'minHeight',t:'Number',b:''},{n:'isActive',t:'Boolean',b:''},{n:'createdAt',t:'Date',b:''}]},
+  {id:'media_addons',name:'media_addons',m:'b',icon:'➕',x:2030,y:70,desc:'হেমিং, আইলেট, স্ট্যান্ড add-on charges।',
+   f:[{n:'_id',t:'ObjectId',b:'pk'},{n:'mediaTypeId',t:'ObjectId → media_types',b:'fk'},{n:'name',t:'String',b:''},{n:'chargeType',t:'enum[fixed,per_piece,per_sq_inch]',b:''},{n:'price',t:'Number',b:''},{n:'isActive',t:'Boolean',b:''},{n:'sortOrder',t:'Number',b:''}]},
+  {id:'banner_order_items',name:'banner_order_items',m:'b',icon:'🏞️',x:1750,y:600,desc:'Real-time: width × height × pricePerSqInch।',
+   f:[{n:'_id',t:'ObjectId',b:'pk'},{n:'orderId',t:'ObjectId → orders',b:'fk'},{n:'mediaTypeId',t:'ObjectId → media_types',b:'fk'},{n:'width',t:'Number',b:''},{n:'height',t:'Number',b:''},{n:'unit',t:'enum[inch,ft]',b:''},{n:'sqArea',t:'Number (computed)',b:''},{n:'quantity',t:'Number',b:''},{n:'selectedAddons',t:'Array',b:'fk'},{n:'basePrice',t:'Number (computed)',b:''},{n:'totalPrice',t:'Number',b:''},{n:'designFileUrl',t:'String?',b:''}]},
+  {id:'dimension_price_log',name:'dimension_price_log',m:'b',icon:'📊',x:2030,y:600,desc:'Admin price update করলে এখানে log রাখা হয়।',
+   f:[{n:'_id',t:'ObjectId',b:'pk'},{n:'mediaTypeId',t:'ObjectId → media_types',b:'fk'},{n:'oldPrice',t:'Number',b:''},{n:'newPrice',t:'Number',b:''},{n:'changedBy',t:'ObjectId → users',b:'fk'},{n:'changedAt',t:'Date',b:''},{n:'note',t:'String?',b:''}]},
+  // ══ MODULE C ══
+  {id:'product_categories',name:'product_categories',m:'c',icon:'🗂️',x:1750,y:1220,desc:'Nested। যেমন: Mugs → Ceramic Mug।',
+   f:[{n:'_id',t:'ObjectId',b:'pk'},{n:'name',t:'String',b:''},{n:'slug',t:'String (unique)',b:'idx'},{n:'parentId',t:'ObjectId? → self',b:'fk'},{n:'imageUrl',t:'String?',b:''},{n:'isActive',t:'Boolean',b:''},{n:'sortOrder',t:'Number',b:''},{n:'createdAt',t:'Date',b:''}]},
+  {id:'products',name:'products',m:'c',icon:'🛍️',x:2030,y:1220,desc:'Module C core। Standard/Bulk threshold।',
+   f:[{n:'_id',t:'ObjectId',b:'pk'},{n:'categoryId',t:'ObjectId → product_categories',b:'fk'},{n:'name',t:'String',b:'idx'},{n:'slug',t:'String (unique)',b:'idx'},{n:'description',t:'String',b:''},{n:'basePrice',t:'Number',b:''},{n:'images',t:'Array',b:''},{n:'isFeatured',t:'Boolean',b:'idx'},{n:'isPublished',t:'Boolean',b:'idx'},{n:'allowCustomDesign',t:'Boolean',b:''},{n:'standardOrderMaxQty',t:'Number',b:''},{n:'bulkOrderMinQty',t:'Number',b:''},{n:'createdAt',t:'Date',b:''}]},
+  {id:'product_variants',name:'product_variants',m:'c',icon:'🎨',x:2310,y:1220,desc:'প্রতিটি size/color-এর আলাদা stock।',
+   f:[{n:'_id',t:'ObjectId',b:'pk'},{n:'productId',t:'ObjectId → products',b:'fk'},{n:'size',t:'String? (S,M,L,XL,2XL)',b:''},{n:'color',t:'String?',b:''},{n:'colorHex',t:'String?',b:''},{n:'sku',t:'String (unique)',b:'idx'},{n:'additionalPrice',t:'Number',b:''},{n:'stock',t:'Number',b:''},{n:'lowStockThreshold',t:'Number',b:''},{n:'isActive',t:'Boolean',b:''}]},
+  {id:'wishlists',name:'wishlists',m:'c',icon:'❤️',x:1750,y:1840,desc:'User-এর wishlist items।',
+   f:[{n:'_id',t:'ObjectId',b:'pk'},{n:'userId',t:'ObjectId → users',b:'fk'},{n:'productId',t:'ObjectId → products',b:'fk'},{n:'variantId',t:'ObjectId? → variants',b:'fk'},{n:'addedAt',t:'Date',b:''}]},
+  {id:'product_reviews',name:'product_reviews',m:'c',icon:'⭐',x:2030,y:1840,desc:'Verified purchase review।',
+   f:[{n:'_id',t:'ObjectId',b:'pk'},{n:'productId',t:'ObjectId → products',b:'fk'},{n:'userId',t:'ObjectId → users',b:'fk'},{n:'orderId',t:'ObjectId → orders',b:'fk'},{n:'rating',t:'Number (1-5)',b:''},{n:'comment',t:'String?',b:''},{n:'isApproved',t:'Boolean',b:''},{n:'createdAt',t:'Date',b:''}]},
+  // ══ ADMIN ══
+  {id:'delivery_zones',name:'delivery_zones',m:'admin',icon:'🚚',x:60,y:1840,desc:'Zone-wise delivery charge। এলাকা অনুযায়ী।',
+   f:[{n:'_id',t:'ObjectId',b:'pk'},{n:'name',t:'String',b:'idx'},{n:'areas',t:'Array',b:''},{n:'charge',t:'Number',b:''},{n:'estimatedDays',t:'Number',b:''},{n:'isActive',t:'Boolean',b:''},{n:'createdAt',t:'Date',b:''}]},
+  {id:'site_config',name:'site_config',m:'admin',icon:'⚙️',x:340,y:1840,desc:'Key-value। site_name, phone, social links।',
+   f:[{n:'_id',t:'ObjectId',b:'pk'},{n:'key',t:'String (unique)',b:'idx'},{n:'group',t:'enum[general,contact,seo,payment]',b:''},{n:'value',t:'Mixed (String|Number|Bool|Obj)',b:''},{n:'label',t:'String',b:''},{n:'updatedAt',t:'Date',b:''},{n:'updatedBy',t:'ObjectId → users',b:'fk'}]},
+  {id:'banners',name:'banners',m:'admin',icon:'🖼️',x:620,y:1840,desc:'Homepage hero slider, promo, notification bar।',
+   f:[{n:'_id',t:'ObjectId',b:'pk'},{n:'title',t:'String',b:''},{n:'imageUrl',t:'String',b:''},{n:'mobileImageUrl',t:'String?',b:''},{n:'linkUrl',t:'String?',b:''},{n:'ctaText',t:'String?',b:''},{n:'bannerType',t:'enum[hero,promo,popup]',b:'idx'},{n:'isActive',t:'Boolean',b:'idx'},{n:'startDate',t:'Date?',b:''},{n:'endDate',t:'Date?',b:''}]},
+  {id:'seo_settings',name:'seo_settings',m:'admin',icon:'🔍',x:900,y:1840,desc:'Per-page SEO। Next.js metadata API।',
+   f:[{n:'_id',t:'ObjectId',b:'pk'},{n:'pageSlug',t:'String (unique)',b:'idx'},{n:'title',t:'String',b:''},{n:'metaDescription',t:'String',b:''},{n:'ogTitle',t:'String?',b:''},{n:'ogImageUrl',t:'String?',b:''},{n:'keywords',t:'Array',b:''},{n:'updatedAt',t:'Date',b:''},{n:'updatedBy',t:'ObjectId → users',b:'fk'}]},
+  {id:'admin_activity_log',name:'admin_activity_log',m:'admin',icon:'📝',x:1180,y:1840,desc:'Admin action audit trail। TTL: 1 year।',
+   f:[{n:'_id',t:'ObjectId',b:'pk'},{n:'adminId',t:'ObjectId → users',b:'fk'},{n:'action',t:'String',b:''},{n:'targetCollection',t:'String',b:''},{n:'targetId',t:'ObjectId?',b:''},{n:'changes',t:'Mixed (JSON)',b:''},{n:'ipAddress',t:'String?',b:''},{n:'createdAt',t:'Date (TTL:1yr)',b:'idx'}]},
+];
+
+const MC={
+  core:{hdr:'#1B4FD8',bdr:'#1E3A5F',bg:'rgba(37,99,235,0.06)'},
+  a:{hdr:'#5B21B6',bdr:'#3B1872',bg:'rgba(124,58,237,0.06)'},
+  b:{hdr:'#065F46',bdr:'#064E3B',bg:'rgba(5,150,105,0.06)'},
+  c:{hdr:'#991B1B',bdr:'#7F1D1D',bg:'rgba(220,38,38,0.06)'},
+  admin:{hdr:'#1E293B',bdr:'#334155',bg:'rgba(51,65,85,0.06)'}
+};
+
+const RELS=[
+  ['users','addresses','1:N','#2563EB'],
+  ['users','refresh_tokens','1:N','#2563EB'],
+  ['users','notifications','1:N','#2563EB'],
+  ['users','cart_items','1:N','#2563EB'],
+  ['users','orders','1:N','#2563EB'],
+  ['orders','order_items','1:N','#3B82F6'],
+  ['orders','payments','1:N','#3B82F6'],
+  ['orders','invoices','1:1','#3B82F6'],
+  ['orders','notifications','1:N','#3B82F6'],
+  ['addresses','orders','REF','#60A5FA'],
+  ['print_categories','print_attribute_groups','1:N','#8B5CF6'],
+  ['print_attribute_groups','print_attribute_options','1:N','#8B5CF6'],
+  ['users','print_quote_requests','1:N','#8B5CF6'],
+  ['print_categories','print_quote_requests','1:N','#A78BFA'],
+  ['print_quote_requests','quotations','1:1','#8B5CF6'],
+  ['quotations','orders','TRIGGER','#7C3AED'],
+  ['media_types','media_addons','1:N','#10B981'],
+  ['media_types','banner_order_items','1:N','#10B981'],
+  ['orders','banner_order_items','1:N','#10B981'],
+  ['media_types','dimension_price_log','LOG','#059669'],
+  ['product_categories','products','1:N','#EF4444'],
+  ['products','product_variants','1:N','#EF4444'],
+  ['products','product_reviews','1:N','#EF4444'],
+  ['users','wishlists','1:N','#F87171'],
+  ['products','wishlists','M:N','#F87171'],
+  ['orders','product_reviews','VERIFIED','#EF4444'],
+  ['users','admin_activity_log','LOG','#64748B'],
+  ['users','site_config','REF','#64748B'],
+];
+
+const BW=248;
+const FH=20;
+const HH=34;
+const DH=22;
+function bh(col){return HH+DH+col.f.length*FH+2}
+
+function renderSections(){
+  const bc=document.getElementById('bc');
+  const secs=[
+    {lbl:'CORE — AUTH & USERS',x:40,y:40,w:1410,h:500,m:'core'},
+    {lbl:'CORE — CART, ORDERS & PAYMENTS',x:40,y:555,w:1700,h:540,m:'core'},
+    {lbl:'MODULE A — CUSTOM PRINT QUOTE SYSTEM',x:40,y:1180,w:1410,h:540,m:'a'},
+    {lbl:'MODULE B — BANNER / SIGNAGE',x:1730,y:40,w:600,h:1090,m:'b'},
+    {lbl:'MODULE C — E-COMMERCE & MERCHANDISE',x:1730,y:1180,w:880,h:780,m:'c'},
+    {lbl:'ADMIN CONFIG & WEBSITE SETTINGS',x:40,y:1800,w:1700,h:500,m:'admin'},
+  ];
+  secs.forEach(s=>{
+    const c=MC[s.m];
+    const d=document.createElement('div');
+    d.className='sb';
+    d.style.cssText=`left:${s.x}px;top:${s.y}px;width:${s.w}px;height:${s.h}px;border-color:${c.bdr};background:${c.bg}`;
+    bc.appendChild(d);
+    const l=document.createElement('div');
+    l.className='sl';
+    l.style.cssText=`left:${s.x+14}px;top:${s.y+7}px;color:${c.hdr}`;
+    l.textContent=s.lbl;
+    bc.appendChild(l);
+  });
+}
+
+function renderBoxes(){
+  const bc=document.getElementById('bc');
+  C.forEach(col=>{
+    const c=MC[col.m];
+    const box=document.createElement('div');
+    box.className='cb';box.id='bx-'+col.id;
+    box.style.cssText=`left:${col.x}px;top:${col.y}px;box-shadow:0 0 0 1.5px ${c.bdr},0 8px 32px rgba(0,0,0,.5)`;
+    let h=`<div class="ch" style="background:${c.hdr}"><span class="ci">${col.icon}</span><span>${col.name}</span></div><div class="cd">${col.desc}</div>`;
+    col.f.forEach(f=>{
+      let badge='',cls='';
+      if(f.b==='pk'){badge='<div class="fb fpk">PK</div>';cls='pk';}
+      else if(f.b==='fk'){badge='<div class="fb ffk">FK</div>';cls='fk';}
+      else if(f.b==='idx'){badge='<div class="fb fidx">⚡</div>';cls='idx';}
+      else badge='<div class="fb fe">·</div>';
+      h+=`<div class="fr">${badge}<span class="fn ${cls}">${f.n}</span><span class="ft">${f.t}</span></div>`;
+    });
+    box.innerHTML=h;bc.appendChild(box);
+  });
+}
+
+function getBox(id){return C.find(c=>c.id===id)}
+function mid(col){const h=bh(col);return{x:col.x+BW/2,y:col.y+h/2}}
+function edge(col,side){
+  const h=bh(col);
+  if(side==='r')return{x:col.x+BW,y:col.y+h/2};
+  if(side==='l')return{x:col.x,y:col.y+h/2};
+  if(side==='b')return{x:col.x+BW/2,y:col.y+h};
+  return{x:col.x+BW/2,y:col.y};
+}
+
+function renderLines(){
+  const svg=document.getElementById('svgl');
+  const defs=document.createElementNS('http://www.w3.org/2000/svg','defs');
+  const cols=['#2563EB','#3B82F6','#60A5FA','#8B5CF6','#A78BFA','#7C3AED','#10B981','#059669','#EF4444','#F87171','#64748B'];
+  cols.forEach((c,i)=>{
+    ['arrow','arrow-start'].forEach((nm,j)=>{
+      const mk=document.createElementNS('http://www.w3.org/2000/svg','marker');
+      mk.setAttribute('id',`mk-${i}-${j}`);mk.setAttribute('markerWidth','8');mk.setAttribute('markerHeight','8');
+      mk.setAttribute('refX',j?'2':'6');mk.setAttribute('refY','3');mk.setAttribute('orient','auto');
+      mk.setAttribute('markerUnits','userSpaceOnUse');
+      const p=document.createElementNS('http://www.w3.org/2000/svg','path');
+      p.setAttribute('d',j?'M8,0 L8,6 L0,3 z':'M0,0 L0,6 L8,3 z');p.setAttribute('fill',c);mk.appendChild(p);defs.appendChild(mk);
+    });
+  });
+  svg.appendChild(defs);
+  const ci=(c)=>cols.indexOf(c)<0?10:cols.indexOf(c);
+  RELS.forEach(([fid,tid,lbl,clr])=>{
+    const f=getBox(fid),t=getBox(tid);if(!f||!t)return;
+    const fh=bh(f),th=bh(t);
+    const fcx=f.x+BW/2,tcx=t.x+BW/2,fcy=f.y+fh/2,tcy=t.y+th/2;
+    let x1,y1,x2,y2;
+    if(Math.abs(fcx-tcx)>Math.abs(fcy-tcy)){
+      if(fcx<tcx){x1=f.x+BW;y1=fcy;x2=t.x;y2=tcy;}
+      else{x1=f.x;y1=fcy;x2=t.x+BW;y2=tcy;}
+    }else{
+      if(fcy<tcy){x1=fcx;y1=f.y+fh;x2=tcx;y2=t.y;}
+      else{x1=fcx;y1=f.y;x2=tcx;y2=t.y+th;}
+    }
+    const dx=x2-x1,dy=y2-y1;
+    const cx1=x1+dx*.45,cy1=y1,cx2=x1+dx*.55,cy2=y2;
+    const idx=ci(clr);
+    const isDash=lbl==='TRIGGER'||lbl==='LOG'||lbl==='REF'||lbl==='VERIFIED';
+    const p=document.createElementNS('http://www.w3.org/2000/svg','path');
+    p.setAttribute('d',`M${x1},${y1} C${cx1},${cy1} ${cx2},${cy2} ${x2},${y2}`);
+    p.setAttribute('stroke',clr);p.setAttribute('stroke-width','1.4');p.setAttribute('fill','none');
+    p.setAttribute('stroke-dasharray',isDash?'6,3':'none');
+    p.setAttribute('marker-end',`url(#mk-${idx}-0)`);p.setAttribute('opacity','.7');svg.appendChild(p);
+    // circle at start
+    const cc=document.createElementNS('http://www.w3.org/2000/svg','circle');
+    cc.setAttribute('cx',x1);cc.setAttribute('cy',y1);cc.setAttribute('r','3');
+    cc.setAttribute('fill',clr);cc.setAttribute('opacity','.8');svg.appendChild(cc);
+    const mx=(x1+x2)/2,my=(y1+y2)/2;
+    const rw=Math.max(lbl.length*5.5,20);
+    const rct=document.createElementNS('http://www.w3.org/2000/svg','rect');
+    rct.setAttribute('x',mx-rw/2);rct.setAttribute('y',my-8);rct.setAttribute('width',rw);
+    rct.setAttribute('height',15);rct.setAttribute('fill','#080F1A');rct.setAttribute('rx',3);
+    rct.setAttribute('stroke',clr);rct.setAttribute('stroke-width','.7');svg.appendChild(rct);
+    const tx=document.createElementNS('http://www.w3.org/2000/svg','text');
+    tx.setAttribute('x',mx);tx.setAttribute('y',my+3.5);tx.setAttribute('text-anchor','middle');
+    tx.setAttribute('font-size','8');tx.setAttribute('fill',clr);tx.setAttribute('font-family','JetBrains Mono,monospace');
+    tx.setAttribute('font-weight','600');tx.textContent=lbl;svg.appendChild(tx);
+  });
+}
+
+// ─── PAN & ZOOM ───────────────────────────────────────────────────────────────
+let sc=0.5,px=30,py=30,drag=false,lx,ly;
+function at(){
+  document.getElementById('cv').style.transform=`translate(${px}px,${py}px) scale(${sc})`;
+  document.getElementById('zoom-lbl').textContent=Math.round(sc*100)+'%';
+}
+function sz(s){sc=Math.max(.1,Math.min(3,s));at()}
+function rv(){sc=.5;px=30;py=30;at()}
+function fv(){
+  const vp=document.getElementById('vp');
+  const s=Math.min(vp.clientWidth/2600,vp.clientHeight/2400)*.9;
+  sc=s;px=(vp.clientWidth-2600*s)/2;py=(vp.clientHeight-2400*s)/2;at();
+}
+const vp=document.getElementById('vp');
+vp.addEventListener('mousedown',e=>{if(e.button!==0)return;drag=true;lx=e.clientX;ly=e.clientY;vp.classList.add('drag')});
+window.addEventListener('mousemove',e=>{if(!drag)return;px+=e.clientX-lx;py+=e.clientY-ly;lx=e.clientX;ly=e.clientY;at()});
+window.addEventListener('mouseup',()=>{drag=false;vp.classList.remove('drag')});
+vp.addEventListener('wheel',e=>{
+  e.preventDefault();
+  const r=vp.getBoundingClientRect(),mx=e.clientX-r.left,my=e.clientY-r.top;
+  const d=e.deltaY>0?.88:1.12,ns=Math.max(.1,Math.min(3,sc*d));
+  px=mx-(mx-px)*(ns/sc);py=my-(my-py)*(ns/sc);sc=ns;at();
+},{passive:false});
+// touch
+let ltd=null;
+vp.addEventListener('touchstart',e=>{
+  if(e.touches.length===1){drag=true;lx=e.touches[0].clientX;ly=e.touches[0].clientY;}
+  else if(e.touches.length===2)ltd=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
+},{passive:true});
+vp.addEventListener('touchmove',e=>{
+  if(e.touches.length===1&&drag){px+=e.touches[0].clientX-lx;py+=e.touches[0].clientY-ly;lx=e.touches[0].clientX;ly=e.touches[0].clientY;at();}
+  else if(e.touches.length===2){const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);if(ltd)sz(sc*d/ltd);ltd=d;}
+},{passive:true});
+vp.addEventListener('touchend',()=>{drag=false;ltd=null});
+
+renderSections();
+renderBoxes();
+renderLines();
+at();
+</script>
+</body>
+</html>
